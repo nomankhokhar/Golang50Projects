@@ -22,21 +22,27 @@ func main(){
 }
 
 func formFunc(w http.ResponseWriter, r *http.Request){
+	// ParseForm parses the raw query from the URL and updates r.Form.
 	if err := r.ParseForm(); err != nil {
 		fmt.Fprintf(w, "ParseForm() err %v", err)
 		return
 	}
 	fmt.Fprintf(w, "POST request successful")
 
+	// FormValue get the form data with attribute name and address
 	name := r.FormValue("name");
 	address:= r.FormValue("address");
 
+	// Write back the response to the client
 	fmt.Fprintf(w, "Name : %s\n", name)
 	fmt.Fprintf(w, "Address : %s\n" , address)	
 }
 
 
 func helloFunc(w http.ResponseWriter, r *http.Request){
+	fmt.Println(w)
+	fmt.Println(r)
+
 	if r.URL.Path != "/hello" {
 		http.Error(w, "404  not found", http.StatusNotFound)
 		return
