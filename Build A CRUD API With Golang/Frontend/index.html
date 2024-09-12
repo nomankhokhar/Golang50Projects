@@ -144,6 +144,7 @@
         await fetch(`${apiUrl}/${id}`, {
           method: "DELETE"
         });
+        alert("Movie deleted successfully");
         fetchMovies();
       }
 
@@ -173,6 +174,8 @@
 
           fetchMovies();
         }
+
+        alert("Movie updated successfully");
       }
 
       fetchMovies();
