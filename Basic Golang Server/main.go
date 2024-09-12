@@ -14,6 +14,8 @@ func main(){
 	http.HandleFunc("/hello", helloFunc)
 	http.HandleFunc("/form", formFunc)
 
+
+
 	fmt.Printf("Server is running on port 8080\n")
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -31,11 +33,16 @@ func formFunc(w http.ResponseWriter, r *http.Request){
 
 	// FormValue get the form data with attribute name and address
 	name := r.FormValue("name");
-	address:= r.FormValue("address");
+	lname:= r.FormValue("lname");
+	country:= r.FormValue("country");
+	subject:= r.FormValue("subject");
+
 
 	// Write back the response to the client
 	fmt.Fprintf(w, "Name : %s\n", name)
-	fmt.Fprintf(w, "Address : %s\n" , address)	
+	fmt.Fprintf(w, "Address : %s\n" , lname)	
+	fmt.Fprintf(w, "Email : %s\n", country)
+	fmt.Fprintf(w, "Phone : %s\n", subject)
 }
 
 
