@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movies API Frontend</title>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+      <h1 class="text-2xl font-bold mb-6 text-center">Movies API</h1>
+
+      <!-- Table to Display Movies -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr>
+              <th class="py-2 px-4 border-b">ID</th>
+              <th class="py-2 px-4 border-b">Title</th>
+              <th class="py-2 px-4 border-b">ISBN</th>
+              <th class="py-2 px-4 border-b">Director</th>
+              <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="moviesTable" class="text-center"></tbody>
+        </table>
+      </div>
+
+      <!-- Add Movie Form -->
+      <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4">Add New Movie</h2>
+        <form id="addMovieForm" class="space-y-4">
+          <div>
+            <label class="block font-medium">Title</label>
+            <input
+              type="text"
+              id="movieTitle"
+              class="w-full border border-gray-300 p-2 rounded-md"
+              required
+            />
+          </div>
+          <div>
+            <label class="block font-medium">ISBN</label>
+            <input
+              type="text"
+              id="movieIsbn"
+              class="w-full border border-gray-300 p-2 rounded-md"
+              required
+            />
+          </div>
+          <div>
+            <label class="block font-medium">Director First Name</label>
+            <input
+              type="text"
+              id="directorFirstName"
+              class="w-full border border-gray-300 p-2 rounded-md"
+              required
+            />
+          </div>
+          <div>
+            <label class="block font-medium">Director Last Name</label>
+            <input
+              type="text"
+              id="directorLastName"
+              class="w-full border border-gray-300 p-2 rounded-md"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          >
+            Add Movie
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const apiUrl = "http://localhost:8000/movies";
+
+      async function fetchMovies() {
+        const response = await fetch(apiUrl);
+        const movies = await response.json();
+        const moviesTable = document.getElementById("moviesTable");
+
+        moviesTable.innerHTML = "";
+
+        movies.forEach((movie) => {
+          const row = `
+                    <tr>
+                        <td class="py-2 px-4 border-b">${movie.ID}</td>
+                        <td class="py-2 px-4 border-b">${movie.Title}</td>
+                        <td class="py-2 px-4 border-b">${movie.Isbn}</td>
+                        <td class="py-2 px-4 border-b">${movie.Director.FirstName} ${movie.Director.LastName}</td>
+                        <td class="py-2 px-4 border-b">
+                            <button class="bg-yellow-500 text-white px-4 py-1 rounded-lg" onclick="editMovie('${movie.ID}')">Edit</button>
+                            <button class="bg-red-500 text-white px-4 py-1 rounded-lg" onclick="deleteMovie('${movie.ID}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+          moviesTable.innerHTML += row;
+        });
+      }
+
+      document
+        .getElementById("addMovieForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const title = document.getElementById("movieTitle").value;
+          const isbn = document.getElementById("movieIsbn").value;
+          const directorFirstName =
+            document.getElementById("directorFirstName").value;
+          const directorLastName =
+            document.getElementById("directorLastName").value;
+
+          const newMovie = {
+            Title: title,
+            Isbn: isbn,
+            Director: {
+              FirstName: directorFirstName,
+              LastName: directorLastName
+            }
+          };
+
+          await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newMovie)
+          });
+          document.getElementById("movieTitle").value = "";
+          document.getElementById("movieIsbn").value = "";
+          document.getElementById("directorFirstName").value = "";
+          document.getElementById("directorLastName").value = "";
+
+          fetchMovies();
+        });
+
+      async function deleteMovie(id) {
+        await fetch(`${apiUrl}/${id}`, {
+          method: "DELETE"
+        });
+        fetchMovies();
+      }
+
+      async function editMovie(id) {
+        const title = prompt("Enter new title");
+        const isbn = prompt("Enter new ISBN");
+        const directorFirstName = prompt("Enter new director first name");
+        const directorLastName = prompt("Enter new director last name");
+
+        if (title && isbn && directorFirstName && directorLastName) {
+          const updatedMovie = {
+            Title: title,
+            Isbn: isbn,
+            Director: {
+              FirstName: directorFirstName,
+              LastName: directorLastName
+            }
+          };
+
+          await fetch(`${apiUrl}/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedMovie)
+          });
+
+          fetchMovies();
+        }
+      }
+
+      fetchMovies();
+    </script>
+  </body>
+</html>
