@@ -19,3 +19,15 @@ Backend is build with Golang Gorilla Mux framework that have 5 API. Other info i
 - Update the Movie
 - Create the Movie
 - Get All the Movie
+
+# Email Verifier
+
+This is program written in Golang that use its own package net to check Email is verified or not like gmail.com, yahoo.com, facebook.com etc
+
+Run the program First with following command
+
+```
+go run main.go
+```
+
+then, pass the email you want to verify.
