@@ -40,6 +40,8 @@ This program is written in Golang that is use to upload file and bunch of files
 
 This program is Written in Golang and Database is MongoDB
 
+Below are the Endpoint
+
 - Get User
 - Create User
 - Delete User
