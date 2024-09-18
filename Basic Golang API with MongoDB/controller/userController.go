@@ -85,5 +85,5 @@ func (uc UserController) DeleteUser (w http.ResponseWriter, r *http.Request, p h
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Deleted user", oid, "\n")	
+	fmt.Fprint(w, "Deleted user", oid, "\n")
 }
