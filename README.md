@@ -31,3 +31,15 @@ go run main.go
 ```
 
 then, pass the email you want to verify.
+
+# Slack Bot File Uploader
+
+This program is written in Golang that is use to upload file and bunch of files
+
+# Basic Golang API with MongoDB
+
+This program is Written in Golang and Database is MongoDB
+
+- Get User
+- Create User
+- Delete User
