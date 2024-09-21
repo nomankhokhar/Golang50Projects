@@ -19,33 +19,26 @@ type weatherData struct {
 		Kelvin float64 `json:"temp"`
 	} `json:"main"`
 }
-
 func loadApiConfig(fileName string) (apiConfigData, error) {
-	bytes , err := ioutil.ReadFile(fileName)
-
+	bytes, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return apiConfigData{}, err
 	}
+
+	// Replace Windows-style line endings (\r\n) with Unix-style line endings (\n)
+	fileContent := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 
 	var config apiConfigData
 
-	err = json.Unmarshal(bytes, &config)
-
+	err = json.Unmarshal([]byte(fileContent), &config)
 	if err != nil {
 		return apiConfigData{}, err
 	}
-	
+
 	return config, nil
 }
 
-
 func main (){
-	config, err := loadApiConfig("config.json")
-
-	if err != nil {
-		panic(err)
-	}
-
 
 	http.HandleFunc("/ping", hello)
 
@@ -57,6 +50,7 @@ func main (){
 
 func getCityWeatherData(w http.ResponseWriter, r *http.Request) {
 	city := strings.SplitN(r.URL.Path, "/", 3)[2]
+	fmt.Println(city)
 	data , err := query(city)
 
 	if err != nil {
@@ -74,16 +68,27 @@ func hello (w http.ResponseWriter, r *http.Request){
 }
 
 func query(city string) (weatherData, error) {
-	url := fmt.Sprintf("http://api.openweathermap.org/data/2.5/weather?q=%s&appid=1b1c0d6f1b6f9c7e3c0f1b6f9c7e3c0", city)
-	resp, err := http.Get(url)
+	apiConfig , err := loadApiConfig(".apiConfig")
+	fmt.Println(apiConfig.OpenWeatherMapApiKey)
 
+	fmt.Println(err)
 	if err != nil {
 		return weatherData{}, err
 	}
 
+	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?APPID=" + apiConfig.OpenWeatherMapApiKey + "&q=" + city)
+
+	fmt.Println("http://api.openweathermap.org/data/2.5/weather?APPID=" + apiConfig.OpenWeatherMapApiKey + "&q=" + city)
+
+	if err != nil {
+		return weatherData{}, err
+	}	
+
 	defer resp.Body.Close()
 
 	var data weatherData
+
+	json.NewDecoder(resp.Body).Decode(&data)
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return weatherData{}, err
