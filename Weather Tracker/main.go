@@ -25,7 +25,6 @@ func loadApiConfig(fileName string) (apiConfigData, error) {
 		return apiConfigData{}, err
 	}
 
-	// Replace Windows-style line endings (\r\n) with Unix-style line endings (\n)
 	fileContent := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 
 	var config apiConfigData
@@ -78,7 +77,7 @@ func query(city string) (weatherData, error) {
 
 	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?APPID=" + apiConfig.OpenWeatherMapApiKey + "&q=" + city)
 
-	fmt.Println("http://api.openweathermap.org/data/2.5/weather?APPID=" + apiConfig.OpenWeatherMapApiKey + "&q=" + city)
+	fmt.Println(resp.Body)
 
 	if err != nil {
 		return weatherData{}, err
@@ -87,8 +86,6 @@ func query(city string) (weatherData, error) {
 	defer resp.Body.Close()
 
 	var data weatherData
-
-	json.NewDecoder(resp.Body).Decode(&data)
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return weatherData{}, err
