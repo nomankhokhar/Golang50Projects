@@ -2,12 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
-
 
 type apiConfigData struct {
 	OpenWeatherMapApiKey string
@@ -19,6 +17,24 @@ type weatherData struct {
 		Kelvin float64 `json:"temp"`
 	} `json:"main"`
 }
+
+// CORS middleware
+func enableCors(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		// Handle preflight request
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func loadApiConfig(fileName string) (apiConfigData, error) {
 	bytes, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -28,7 +44,6 @@ func loadApiConfig(fileName string) (apiConfigData, error) {
 	fileContent := strings.ReplaceAll(string(bytes), "\r\n", "\n")
 
 	var config apiConfigData
-
 	err = json.Unmarshal([]byte(fileContent), &config)
 	if err != nil {
 		return apiConfigData{}, err
@@ -37,20 +52,20 @@ func loadApiConfig(fileName string) (apiConfigData, error) {
 	return config, nil
 }
 
-func main (){
+func main() {
+	// Create a new mux (router)
+	mux := http.NewServeMux()
 
-	http.HandleFunc("/ping", hello)
+	mux.HandleFunc("/ping", hello)
+	mux.HandleFunc("/weather/", getCityWeatherData)
 
-	http.HandleFunc("/weather/", getCityWeatherData)
-
-
-	http.ListenAndServe(":8080", nil)
+	// Wrap the mux with CORS middleware
+	http.ListenAndServe(":8080", enableCors(mux))
 }
 
 func getCityWeatherData(w http.ResponseWriter, r *http.Request) {
 	city := strings.SplitN(r.URL.Path, "/", 3)[2]
-	fmt.Println(city)
-	data , err := query(city)
+	data, err := query(city)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -61,32 +76,22 @@ func getCityWeatherData(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-
-func hello (w http.ResponseWriter, r *http.Request){
-	w.Write([]byte("Hello!"))	
+func hello(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello!"))
 }
 
 func query(city string) (weatherData, error) {
-	apiConfig , err := loadApiConfig(".apiConfig")
-	fmt.Println(apiConfig.OpenWeatherMapApiKey)
-
-	fmt.Println(err)
+	apiConfig, err := loadApiConfig(".apiConfig")
 	if err != nil {
 		return weatherData{}, err
 	}
 
 	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?APPID=" + apiConfig.OpenWeatherMapApiKey + "&q=" + city)
-
-	fmt.Println(resp.Body)
-
 	if err != nil {
 		return weatherData{}, err
-	}	
-
+	}
 	defer resp.Body.Close()
-
 	var data weatherData
-
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return weatherData{}, err
 	}
