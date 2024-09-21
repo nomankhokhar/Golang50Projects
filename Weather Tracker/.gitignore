@@ -1,3 +1,5 @@
 .apiConfig/
 /.apiConfig
-.apiConfig
+.apiConfig/
+./.apiConfig
+apiConfig/

@@ -45,3 +45,12 @@ Below are the Endpoint
 - Get User
 - Create User
 - Delete User
+
+# Basic Golang API with MongoDB
+
+This program is Written in Golang with Http package and frontend is build with Tailwind CSS
+
+Below are the Endpoint
+
+- Hello
+- weather
