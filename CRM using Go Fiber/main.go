@@ -23,9 +23,12 @@ func initDatabase(){
 
 func main() {
 	app := fiber.New()
-	setupRoutes(app)
+	
 	initDatabase()
+	
+	setupRoutes(app)
 	app.Listen(3000)
+	
 	defer db.DBConn.Close()
 }
 
@@ -35,18 +38,4 @@ func setupRoutes(app *fiber.App){
 	app.Get("api/v1/lead/:id" , lead.GetLead)
 	app.Post("api/v1/lead" , lead.NewLead)
 	app.Delete("api/v1/lead/:id" , lead.DeleteLead)
-}
-
-func GetLeads(){
-	fmt.Println("Leads")
-}
-func GetLead(){
-	fmt.Println("Lead")
-}
-
-func NewLead(){
-	fmt.Println("New Lead")
-}
-func DeleteLead(){
-	fmt.Println("Del Lead")
 }
