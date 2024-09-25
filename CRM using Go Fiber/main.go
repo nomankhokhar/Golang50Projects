@@ -15,7 +15,7 @@ func initDatabase(){
 	db.DBConn , err = gorm.Open("sqlite3", "leads.db")
 
 	if err != nil {
-		panic("failed to connect database")
+		panic(fmt.Sprintf("failed to connect database: %v", err))
 	}
 	db.DBConn.AutoMigrate(&lead.Lead{})
 	fmt.Println("Database is Migrated")
