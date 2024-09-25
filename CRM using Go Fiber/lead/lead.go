@@ -15,7 +15,10 @@ type Lead struct {
 	Phone 		int
 }
 func GetLeads(c *fiber.Ctx){
-	
+	db := db.DBConn
+	var leads []Lead
+	db.Find(&leads)
+	c.JSON(leads)
 }
 
 func GetLead(c *fiber.Ctx){
@@ -26,6 +29,32 @@ func GetLead(c *fiber.Ctx){
 	c.JSON(lead)
 }
 
-func NewLead(c *fiber.Ctx){}
+func NewLead(c *fiber.Ctx){
+	db := db.DBConn
+	lead := new(Lead)
+	if err := c.BodyParser(lead); err != nil {
+		c.Status(503).Send(err)
+		return
+	}
 
-func DeleteLead(c *fiber.Ctx){}
+	db.Create(&lead)
+
+	c.JSON(lead)
+}
+
+func DeleteLead(c *fiber.Ctx){
+	id := c.Params("id")
+
+	db := db.DBConn
+
+	var lead Lead
+	db.First(&lead, id)
+	if lead.Name == "" {
+		c.Status(500).Send("No lead found with ID")
+		return
+	}
+
+	db.Delete(&lead)
+	c.Send("Lead Successfully Deleted")
+
+}
