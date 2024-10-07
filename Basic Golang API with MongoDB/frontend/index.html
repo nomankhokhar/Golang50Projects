@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <div class="container mx-auto p-8">
+      <h1 class="text-3xl font-bold text-center mb-8">
+        User Management System
+      </h1>
+
+      <!-- Create User Form -->
+      <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 class="text-2xl font-semibold mb-4">Create User</h2>
+        <form id="createUserForm" class="flex flex-col space-y-4">
+          <input
+            type="text"
+            id="name"
+            placeholder="Name"
+            class="border rounded w-full py-2 px-3"
+          />
+          <input
+            type="text"
+            id="gender"
+            placeholder="Gender"
+            class="border rounded w-full py-2 px-3"
+          />
+          <input
+            type="number"
+            id="age"
+            placeholder="Age"
+            class="border rounded w-full py-2 px-3"
+          />
+          <button
+            type="submit"
+            class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
+          >
+            Create User
+          </button>
+        </form>
+      </div>
+
+      <!-- Fetch User -->
+      <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 class="text-2xl font-semibold mb-4">Fetch User by ID</h2>
+        <form id="fetchUserForm" class="flex flex-col space-y-4">
+          <input
+            type="text"
+            id="userId"
+            placeholder="User ID"
+            class="border rounded w-full py-2 px-3"
+          />
+          <button
+            type="submit"
+            class="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-700"
+          >
+            Fetch User
+          </button>
+        </form>
+        <div id="userData" class="mt-4"></div>
+      </div>
+
+      <!-- Delete User -->
+      <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 class="text-2xl font-semibold mb-4">Delete User by ID</h2>
+        <form id="deleteUserForm" class="flex flex-col space-y-4">
+          <input
+            type="text"
+            id="deleteUserId"
+            placeholder="User ID"
+            class="border rounded w-full py-2 px-3"
+          />
+          <button
+            type="submit"
+            class="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-700"
+          >
+            Delete User
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const apiUrl = "http://localhost:8080";
+
+      // Create User
+      document
+        .getElementById("createUserForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = document.getElementById("name").value;
+          const gender = document.getElementById("gender").value;
+          const age = document.getElementById("age").value;
+
+          const response = await fetch(`${apiUrl}/user`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, gender, age })
+          });
+
+          if (response.ok) {
+            alert("User created successfully!");
+          } else {
+            alert("Failed to create user.");
+          }
+        });
+
+      // Fetch User
+      document
+        .getElementById("fetchUserForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const userId = document.getElementById("userId").value;
+
+          const response = await fetch(`${apiUrl}/user/${userId}`);
+
+          if (response.ok) {
+            const userData = await response.json();
+            document.getElementById("userData").innerText = JSON.stringify(
+              userData,
+              null,
+              2
+            );
+          } else {
+            document.getElementById("userData").innerText = "User not found!";
+          }
+        });
+
+      // Delete User
+      document
+        .getElementById("deleteUserForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const userId = document.getElementById("deleteUserId").value;
+
+          const response = await fetch(`${apiUrl}/user/${userId}`, {
+            method: "DELETE"
+          });
+
+          if (response.ok) {
+            alert("User deleted successfully!");
+          } else {
+            alert("Failed to delete user.");
+          }
+        });
+    </script>
+  </body>
+</html>
